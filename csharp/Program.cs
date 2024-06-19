@@ -11,13 +11,13 @@ var nonceInLowestHash = "";
 
 for (var iteration = 0; iteration < ITERATIONS; iteration++)
 {
-    var stopwatch = Stopwatch.StartNew();
-
     var start = iteration * BATCH_SIZE;
     var end = (iteration + 1) * BATCH_SIZE;
 
     Console.WriteLine(string.Empty);
     Console.WriteLine($"Attempt: {iteration} ({start} - {end})");
+
+    var stopwatch = Stopwatch.StartNew();
 
     for (var i = start; i < end; i++)
     {
