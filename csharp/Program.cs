@@ -1,11 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using Shallenge.CSharp;
 
-const long ITERATIONS = 10;
-const long BATCH_SIZE = 10_000_000;
+const long ITERATIONS = 5;
+const long BATCH_SIZE = 50_000_000;
 const string USERNAME = "BrownKnight";
 
+var lowestHashBytes = Convert.FromHexString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+Console.WriteLine(lowestHashBytes.Count());
 var lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
 var nonceInLowestHash = "";
 
@@ -14,8 +17,7 @@ for (var iteration = 0; iteration < ITERATIONS; iteration++)
     var start = iteration * BATCH_SIZE;
     var end = (iteration + 1) * BATCH_SIZE;
 
-    Console.WriteLine(string.Empty);
-    Console.WriteLine($"Attempt: {iteration} ({start} - {end})");
+    Console.WriteLine($"Start Attempt: {iteration} ({start} - {end})");
 
     var stopwatch = Stopwatch.StartNew();
 
@@ -25,19 +27,26 @@ for (var iteration = 0; iteration < ITERATIONS; iteration++)
         var stringToHash = $@"{USERNAME}/{nonce}";
         var toHash = Encoding.ASCII.GetBytes(stringToHash);
 
-        var hash = SHA256.HashData(toHash);
-        var hashString = Convert.ToHexString(hash);
+        var hashed = SHA256.HashData(toHash);
+        var hashedString = Convert.ToHexString(hashed);    
 
-        if (string.CompareOrdinal(hashString, lowestHash) < 0)
+        if (string.CompareOrdinal(hashedString, lowestHash) < 0)
         {
-            lowestHash = hashString;
+            lowestHash = hashedString;
             nonceInLowestHash = stringToHash;
         }
     }
 
-    var rate = (BATCH_SIZE / stopwatch.ElapsedMilliseconds) * 1000;
-    Console.WriteLine($"Processed {BATCH_SIZE} hashes in {stopwatch.ElapsedMilliseconds}ms ({rate} hashes per second)");
-    Console.WriteLine($"Shortest Hash: {lowestHash}");
-    Console.WriteLine($"Nonce Used: {nonceInLowestHash}");
+    var hashRate = (BATCH_SIZE / stopwatch.ElapsedMilliseconds) * 1000;
+
+    var report = $"""
+    Attempt {iteration} Report:
+    Processed {BATCH_SIZE} hashes in {stopwatch.ElapsedMilliseconds}ms ({hashRate} hashes per second)
+    Shortest Hash: {lowestHash}
+    Nonce Used: {nonceInLowestHash}
+
+    """;
+
+    Console.WriteLine(report);
 }
 
