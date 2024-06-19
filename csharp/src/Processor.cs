@@ -6,11 +6,11 @@ namespace Shallenge.CSharp;
 
 public static class Processor
 {
+    private static readonly SHA256 s_sha256 = SHA256.Create();
     private const string USERNAME = "BrownKnight/Having/Fun/With/CSharp";
 
     public static (string Hash, string Nonce) ProcessBatch(int batchNumber, long batchSize)
     {
-        var sha256 = SHA256.Create();
         var lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
         var nonceInLowestHash = "";
 
@@ -23,15 +23,7 @@ public static class Processor
 
         foreach (var stringToHash in generator)
         {
-            var toHash = Encoding.ASCII.GetBytes(stringToHash);
-            var hashed = sha256.ComputeHash(toHash);
-            var hashedString = Convert.ToHexString(hashed);
-
-            if (string.CompareOrdinal(hashedString, lowestHash) < 0)
-            {
-                lowestHash = hashedString;
-                nonceInLowestHash = stringToHash;
-            }
+            HashAndCheck(ref lowestHash, ref nonceInLowestHash, stringToHash);
         }
 
         var report = $"""
@@ -45,5 +37,18 @@ public static class Processor
         Console.WriteLine(report);
 
         return (lowestHash, nonceInLowestHash);
+    }
+
+    public static void HashAndCheck(ref string lowestHash, ref string nonceInLowestHash, string stringToHash)
+    {
+        var toHash = Encoding.ASCII.GetBytes(stringToHash);
+        var hashed = s_sha256.ComputeHash(toHash);
+        var hashedString = Convert.ToHexString(hashed);
+
+        if (string.CompareOrdinal(hashedString, lowestHash) < 0)
+        {
+            lowestHash = hashedString;
+            nonceInLowestHash = stringToHash;
+        }
     }
 }
