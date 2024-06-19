@@ -19,8 +19,8 @@ public class StringGeneratorTests
     [InlineData('/', '0')]
     public void VerifyNextChar(char initial, char expected)
     {
-        var generator = StringGenerator.Generate(initial.ToString(), 1);
-        var next = generator.Take(1).First();
+        var generator = new StringGenerator();
+        var next = generator.Generate(string.Empty, initial.ToString(), 1).First();;
 
         Assert.Equal(expected, next.Last());
     }

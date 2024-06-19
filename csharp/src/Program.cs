@@ -12,7 +12,8 @@ var stopwatch = Stopwatch.StartNew();
 
 Parallel.For(0, BATCHES, i =>
 {
-    var (hash, nonce) = Processor.ProcessBatch(i, BATCH_SIZE);
+    var processor = new Processor();
+    var (hash, nonce) = processor.ProcessBatch(i, BATCH_SIZE);
     if (string.CompareOrdinal(hash, lowestHash) < 0)
     {
         lowestHash = hash;

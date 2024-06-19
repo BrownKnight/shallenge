@@ -1,15 +1,17 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Shallenge.CSharp;
 
-public static class Processor
+public sealed class Processor
 {
-    private static readonly SHA256 s_sha256 = SHA256.Create();
+    private readonly SHA256 s_sha256 = SHA256.Create();
+    private readonly StringGenerator s_generator = new StringGenerator();
     private const string USERNAME = "BrownKnight/Having/Fun/With/CSharp";
 
-    public static (string Hash, string Nonce) ProcessBatch(int batchNumber, long batchSize)
+    public (string Hash, string Nonce) ProcessBatch(int batchNumber, long batchSize)
     {
         var lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
         var nonceInLowestHash = "";
@@ -17,7 +19,7 @@ public static class Processor
         var start = batchNumber * batchSize;
         Console.WriteLine($"Start Attempt: {batchNumber} (starting at {start} with {batchSize} iterations)");
 
-        var generator = StringGenerator.Generate(USERNAME, start.ToString(), batchSize);
+        var generator = s_generator.Generate(USERNAME, start.ToString(), batchSize);
 
         var stopwatch = Stopwatch.StartNew();
 
@@ -39,7 +41,8 @@ public static class Processor
         return (lowestHash, nonceInLowestHash);
     }
 
-    public static void HashAndCheck(ref string lowestHash, ref string nonceInLowestHash, string stringToHash)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void HashAndCheck(ref string lowestHash, ref string nonceInLowestHash, string stringToHash)
     {
         var toHash = Encoding.ASCII.GetBytes(stringToHash);
         var hashed = s_sha256.ComputeHash(toHash);

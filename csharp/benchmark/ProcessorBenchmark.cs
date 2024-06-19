@@ -15,17 +15,20 @@ namespace benchmark
         private string lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
         private string lowestNonse = "";
 
+        private StringGenerator stringGenerator = new StringGenerator();
+        private Processor processor = new Processor();
+
         [Benchmark]
         public void WithStringGenerator()
         {
-            var toHash = StringGenerator.Generate("BrownKnight/Having/Fun/With/CSharp", "0", 1).First();
-            Processor.HashAndCheck(ref lowestHash, ref lowestNonse, toHash);
+            var toHash = stringGenerator.Generate("BrownKnight/Having/Fun/With/CSharp", "0", 1).First();
+            processor.HashAndCheck(ref lowestHash, ref lowestNonse, toHash);
         }
 
         [Benchmark]
         public void WithConstantString()
         {
-            Processor.HashAndCheck(ref lowestHash, ref lowestNonse, toHash);
+            processor.HashAndCheck(ref lowestHash, ref lowestNonse, toHash);
         }
     }
 }

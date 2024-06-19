@@ -1,10 +1,10 @@
 namespace Shallenge.CSharp;
 
-public static class StringGenerator {
+public sealed class StringGenerator {
 
     private const int LENGTH = 16;
 
-    public static IEnumerable<string> Generate(string prefix, string initial, long iterations)
+    public IEnumerable<string> Generate(string prefix, string initial, long iterations)
     {
         var chars = $"{prefix}{initial.PadLeft(LENGTH, '0')}".ToCharArray();
 
