@@ -31,6 +31,8 @@ public static class StringGenerator {
         >= 'A' and < 'Z' => ++c,
         'Z' => 'a',
         >= 'a' and < 'z' => ++c,
+        'z' => '+',
+        '+' => '/',
         _ => '0' // Need to roll over
     };
 }
