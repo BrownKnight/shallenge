@@ -4,13 +4,13 @@ public static class StringGenerator {
 
     private const int LENGTH = 16;
 
-    public static IEnumerable<string> Generate(string initial, long iterations)
+    public static IEnumerable<string> Generate(string prefix, string initial, long iterations)
     {
-        var chars = initial.PadLeft(LENGTH, '0').ToCharArray();
+        var chars = $"{prefix}{initial.PadLeft(LENGTH, '0')}".ToCharArray();
 
-        for (var i = 0; i < iterations; i++)
+        for (var iteration = 0; iteration < iterations; iteration++)
         {
-            var index = LENGTH - 1;
+            var index = chars.Length - 1;
             while (index > 0)
             {
                 chars[index] = NextChar(chars[index]);

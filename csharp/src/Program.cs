@@ -10,53 +10,50 @@ const string USERNAME = "BrownKnight/Having/Fun/With/CSharp";
 var lowestHashBytes = Convert.FromHexString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 var lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
 var nonceInLowestHash = "";
-var lowestIteration = 0L;
 
 var stopwatch = Stopwatch.StartNew();
 
 Parallel.For(0, BATCHES, i =>
 {
-    var (hash, nonce, iteration) = ProcessBatch(i);
+    var (hash, nonce) = ProcessBatch(i);
     if (string.CompareOrdinal(hash, lowestHash) < 0)
     {
         lowestHash = hash;
         nonceInLowestHash = nonce;
-        lowestIteration = iteration;
     }
 });
 
 var hashRate = (BATCHES * BATCH_SIZE / stopwatch.ElapsedMilliseconds) * 1000;
+var timePerHash = stopwatch.Elapsed.TotalNanoseconds / BATCH_SIZE;
 
 var report = $"""
 
 ==============================
 Overall:
-Processed {BATCHES * BATCH_SIZE} hashes in {stopwatch.ElapsedMilliseconds}ms ({hashRate} hashes per second)
+Processed {BATCHES * BATCH_SIZE} hashes in {stopwatch.ElapsedMilliseconds}ms
+Performence: {hashRate} hashes per second, {timePerHash}ns per hash
 Shortest Hash: {lowestHash}
-Nonce Used: {nonceInLowestHash} ({lowestIteration})
+Nonce Used: {nonceInLowestHash}
 ==============================
 """;
 
 Console.WriteLine(report);
 
-static (string Hash, string Nonce, long Iteration) ProcessBatch(int batchNumber)
+static (string Hash, string Nonce) ProcessBatch(int batchNumber)
 {
     var lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
     var nonceInLowestHash = "";
-    var lowestIteration = 0L;
 
     var start = batchNumber * BATCH_SIZE;
     Console.WriteLine($"Start Attempt: {batchNumber} (starting at {start} with {BATCH_SIZE} iterations)");
 
-    var generator = StringGenerator.Generate(start.ToString(), BATCH_SIZE);
+    var generator = StringGenerator.Generate(USERNAME, start.ToString(), BATCH_SIZE);
 
     var stopwatch = Stopwatch.StartNew();
 
-    foreach (var nonce in generator)
+    foreach (var stringToHash in generator)
     {
-        var stringToHash = $@"{USERNAME}/{nonce}";
         var toHash = Encoding.ASCII.GetBytes(stringToHash);
-
         var hashed = SHA256.HashData(toHash);
         var hashedString = Convert.ToHexString(hashed);
 
@@ -67,18 +64,16 @@ static (string Hash, string Nonce, long Iteration) ProcessBatch(int batchNumber)
         }
     }
 
-    var hashRate = (BATCH_SIZE / stopwatch.ElapsedMilliseconds) * 1000;
-
     var report = $"""
     Attempt {batchNumber} ({start}) Report:
-    Processed {BATCH_SIZE} hashes in {stopwatch.ElapsedMilliseconds}ms ({hashRate} hashes per second)
+    Processed {BATCH_SIZE} hashes in {stopwatch.ElapsedMilliseconds}ms
     Shortest Hash: {lowestHash}
-    Nonce Used: {nonceInLowestHash} ({lowestIteration})
+    Nonce Used: {nonceInLowestHash}
 
     """;
 
     Console.WriteLine(report);
 
-    return (lowestHash, nonceInLowestHash, lowestIteration);
+    return (lowestHash, nonceInLowestHash);
 }
 
