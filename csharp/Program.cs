@@ -22,7 +22,8 @@ for (var iteration = 0; iteration < ITERATIONS; iteration++)
     for (var i = start; i < end; i++)
     {
         var nonce = Convert.ToBase64String(BitConverter.GetBytes(i));
-        var toHash = Encoding.ASCII.GetBytes($@"{USERNAME}/{nonce}");
+        var stringToHash = $@"{USERNAME}/{nonce}";
+        var toHash = Encoding.ASCII.GetBytes(stringToHash);
 
         var hash = SHA256.HashData(toHash);
         var hashString = Convert.ToHexString(hash);
@@ -30,7 +31,7 @@ for (var iteration = 0; iteration < ITERATIONS; iteration++)
         if (string.CompareOrdinal(hashString, lowestHash) < 0)
         {
             lowestHash = hashString;
-            nonceInLowestHash = nonce;
+            nonceInLowestHash = stringToHash;
         }
     }
 
