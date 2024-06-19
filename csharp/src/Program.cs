@@ -41,6 +41,7 @@ Console.WriteLine(report);
 
 static (string Hash, string Nonce) ProcessBatch(int batchNumber)
 {
+    var sha256 = SHA256.Create();
     var lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
     var nonceInLowestHash = "";
 
@@ -54,7 +55,7 @@ static (string Hash, string Nonce) ProcessBatch(int batchNumber)
     foreach (var stringToHash in generator)
     {
         var toHash = Encoding.ASCII.GetBytes(stringToHash);
-        var hashed = SHA256.HashData(toHash);
+        var hashed = sha256.ComputeHash(toHash);
         var hashedString = Convert.ToHexString(hashed);
 
         if (string.CompareOrdinal(hashedString, lowestHash) < 0)
