@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using Shallenge.CSharp;
 
-const int BATCHES = 32;
-const long BATCH_SIZE = 50_000_000;
+const int BATCHES = 4;
+const long BATCH_SIZE = 281_474_976_710_656; // 64^8 so that we are always changing the last 8 chars
 
 var lowestHashBytes = Convert.FromHexString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 var lowestHash = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ_Z";
