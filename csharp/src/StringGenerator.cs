@@ -1,14 +1,18 @@
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
+
 namespace Shallenge.CSharp;
 
-public sealed class StringGenerator {
-
+public sealed class StringGenerator(int id, Channel<string> channel)
+{
     private const int LENGTH = 12;
+    private const string USERNAME = "BrownKnight/Having/Fun/With/CSharp+Apple/Silicon/Mac";
 
-    public IEnumerable<string> Generate(string prefix, string initial, long iterations)
+    public async void GenerateAsync(long count)
     {
-        var chars = $"{prefix}{initial.PadLeft(LENGTH, '0')}".ToCharArray();
+        var chars = $"{USERNAME}{id.ToString().PadRight(LENGTH, '0')}".ToCharArray();
 
-        for (var iteration = 0; iteration < iterations; iteration++)
+        for(var i = 0L; i < count; i++)
         {
             var index = chars.Length - 1;
             while (index > 0)
@@ -20,10 +24,11 @@ public sealed class StringGenerator {
                 index--;
             }
 
-            yield return new string(chars);
+            await channel.Writer.WriteAsync(new string(chars));
         }
     }
-
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static char NextChar(char c) => c switch
     {
         >= '0' and < '9' => ++c,
