@@ -1,10 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Channels;
 
 namespace Shallenge.CSharp;
 
-public sealed class Processor(int id, Channel<string> channel)
+public sealed class Processor(string id, Queue<string> queue)
 {
     public (string Hash, string Nonce) Process()
     {
@@ -14,7 +13,7 @@ public sealed class Processor(int id, Channel<string> channel)
         var nonceInLowestHash = "";
         using var sha256 = SHA256.Create();
 
-        while (channel.Reader.TryRead(out var stringToHash))
+        while (queue.TryDequeue(out var stringToHash))
         {
             var toHash = Encoding.ASCII.GetBytes(stringToHash);
             var hashed = sha256.ComputeHash(toHash);
