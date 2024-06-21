@@ -3,6 +3,16 @@
 Current Best:
 
 ```plaintext
+==============================
+Overall:
+Processed 137438953472 hashes in 6494330ms
+Performence: Total 21162000 hashes per second, est. 189.01ns per hash
+Shortest Hash: 0000000002E5BE1B3F905549EBA841E69ED59FEBD66DBA19420CBE64DA934859
+Nonce Used: BrownKnight/Having/Fun/With/CSharp+Apple/Silicon/Mac0612032+DA0G
+==============================
+```
+
+```plaintext
 Batch Size 50_000_000, 32 Batches
 ==============================
 Overall:
@@ -57,3 +67,10 @@ Shortest Hash: 000000001C2C58BCFFC7401B1ED30FCF5F7084140645924BEC5FACE496AD29E2
 Nonce Used: BrownKnight/Having/Fun/With/CSharp000000200008K/CK
 ==============================
 ```
+
+
+## Benchmark Learning
+
+### StringCompareBenchmark
+
+`string.CompareOrdinal` is much faster that a `string.Compare`, and limiting the comparison to the first part of the string was no faster. So switched `Processor.HashAndCheck` to do that.

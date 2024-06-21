@@ -2,7 +2,7 @@ namespace Shallenge.CSharp;
 
 public sealed class StringGenerator {
 
-    private const int LENGTH = 16;
+    private const int LENGTH = 12;
 
     public IEnumerable<string> Generate(string prefix, string initial, long iterations)
     {

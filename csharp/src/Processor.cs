@@ -7,9 +7,9 @@ namespace Shallenge.CSharp;
 
 public sealed class Processor
 {
-    private readonly SHA256 s_sha256 = SHA256.Create();
-    private readonly StringGenerator s_generator = new StringGenerator();
-    private const string USERNAME = "BrownKnight/Having/Fun/With/CSharp";
+    private readonly SHA256 _sha256 = SHA256.Create();
+    private readonly StringGenerator _generator = new StringGenerator();
+    private const string USERNAME = "BrownKnight/Having/Fun/With/CSharp+Apple/Silicon/Mac";
 
     public (string Hash, string Nonce) ProcessBatch(int batchNumber, long batchSize)
     {
@@ -17,9 +17,9 @@ public sealed class Processor
         var nonceInLowestHash = "";
 
         var start = batchNumber * batchSize;
-        Console.WriteLine($"Start Attempt: {batchNumber} (starting at {start} with {batchSize} iterations)");
+        Console.WriteLine($"Start Batch: {batchNumber} (starting at {start} with {batchSize} iterations)");
 
-        var generator = s_generator.Generate(USERNAME, start.ToString(), batchSize);
+        var generator = _generator.Generate(USERNAME, start.ToString(), batchSize);
 
         var stopwatch = Stopwatch.StartNew();
 
@@ -28,13 +28,17 @@ public sealed class Processor
             HashAndCheck(ref lowestHash, ref nonceInLowestHash, stringToHash);
         }
 
-        var report = $"""
-    Attempt {batchNumber} ({start}) Report:
-    Processed {batchSize} hashes in {stopwatch.ElapsedMilliseconds}ms
-    Shortest Hash: {lowestHash}
-    Nonce Used: {nonceInLowestHash}
+        var hashRate = (batchSize / stopwatch.ElapsedMilliseconds) * 1000;
+        var timePerHash = stopwatch.Elapsed.TotalNanoseconds / batchSize;
 
-    """;
+        var report = $"""
+        Batch {batchNumber} ({start}) Report:
+        Processed {batchSize} hashes in {stopwatch.ElapsedMilliseconds}ms
+        Performence: {hashRate} hashes per second, {timePerHash:F2}ns per hash
+        Shortest Hash: {lowestHash}
+        Nonce Used: {nonceInLowestHash}
+
+        """;
 
         Console.WriteLine(report);
 
@@ -45,10 +49,10 @@ public sealed class Processor
     public void HashAndCheck(ref string lowestHash, ref string nonceInLowestHash, string stringToHash)
     {
         var toHash = Encoding.ASCII.GetBytes(stringToHash);
-        var hashed = s_sha256.ComputeHash(toHash);
+        var hashed = _sha256.ComputeHash(toHash);
         var hashedString = Convert.ToHexString(hashed);
 
-        if (string.CompareOrdinal(hashedString, lowestHash) < 0)
+        if (string.CompareOrdinal(hashedString, 0, lowestHash, 0, 10) < 0)
         {
             lowestHash = hashedString;
             nonceInLowestHash = stringToHash;
