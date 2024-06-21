@@ -26,6 +26,8 @@ public sealed class StringGenerator(int id, Channel<string> channel)
 
             await channel.Writer.WriteAsync(new string(chars));
         }
+
+        channel.Writer.Complete();
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

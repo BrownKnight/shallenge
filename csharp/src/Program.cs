@@ -2,8 +2,10 @@
 using System.Threading.Channels;
 using Shallenge.CSharp;
 
-const int MAX_THREADS = 5;
+const int MAX_THREADS = 6;
 const long NUM_HASHES = 100_000_000;
+
+var cts = new CancellationTokenSource();
 
 var channel = Channel.CreateUnbounded<string>();
 
@@ -13,13 +15,16 @@ var processors = Enumerable.Range(0, MAX_THREADS).Select(i => new Processor(i, c
 var stopwatch = Stopwatch.StartNew();
 
 var generatorTask = Task.Run(() => generator.GenerateAsync(NUM_HASHES));
-var processorTasks = processors.Select(p => Task.Run(() => p.Process())).ToList();
+var processorTasks = processors.Select(p => Task.Run(() => p.Process(cts.Token))).ToList();
 
 var timer = new Timer((obj) => {
     Console.WriteLine($"Size of Channel: {channel.Reader.Count}");
 }, null, 0, 5000);
 
 await generatorTask;
+await channel.Reader.Completion;
+cts.Cancel();
+
 var results = await Task.WhenAll(processorTasks);
 var (Hash, Nonce) = results.MinBy(x => x.Hash, StringComparer.Ordinal);
 

@@ -6,7 +6,7 @@ namespace Shallenge.CSharp;
 
 public sealed class Processor(int id, Channel<string> channel)
 {
-    public (string Hash, string Nonce) Process()
+    public async Task<(string Hash, string Nonce)> Process(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Start Processor {id}");
 
@@ -14,16 +14,23 @@ public sealed class Processor(int id, Channel<string> channel)
         var nonceInLowestHash = "";
         using var sha256 = SHA256.Create();
 
-        while (channel.Reader.TryRead(out var stringToHash))
+        while (!cancellationToken.IsCancellationRequested)
         {
-            var toHash = Encoding.ASCII.GetBytes(stringToHash);
-            var hashed = sha256.ComputeHash(toHash);
-            var hashedString = Convert.ToHexString(hashed);
-
-            if (string.CompareOrdinal(hashedString, 0, lowestHash, 0, 10) < 0)
+            try
             {
-                lowestHash = hashedString;
-                nonceInLowestHash = stringToHash;
+                var stringToHash = await channel.Reader.ReadAsync(cancellationToken);
+                var toHash = Encoding.ASCII.GetBytes(stringToHash);
+                var hashed = sha256.ComputeHash(toHash);
+                var hashedString = Convert.ToHexString(hashed);
+
+                if (string.CompareOrdinal(hashedString, 0, lowestHash, 0, 10) < 0)
+                {
+                    lowestHash = hashedString;
+                    nonceInLowestHash = stringToHash;
+                }
+            } catch (Exception e)
+            {
+                // do nothing
             }
         }
 
