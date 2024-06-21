@@ -2,7 +2,7 @@
 using System.Threading.Channels;
 using Shallenge.CSharp;
 
-const int MAX_THREADS = 6;
+const int MAX_THREADS = 5;
 const long NUM_HASHES = 100_000_000;
 
 var cts = new CancellationTokenSource();
