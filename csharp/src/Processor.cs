@@ -6,7 +6,7 @@ namespace Shallenge.CSharp;
 
 public sealed class Processor(int id, Channel<string> channel)
 {
-    public (string Hash, string Nonce) Process(CancellationToken cancellationToken)
+    public (string Hash, string Nonce) Process()
     {
         Console.WriteLine($"Start Processor {id}");
 
